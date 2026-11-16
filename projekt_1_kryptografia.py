@@ -1,7 +1,7 @@
 """Projekt 1 – Kryptografia. Python 3, aplikacja konsolowa.
 
-Po wyborze szyfrowania lub deszyfrowania uzytkownik wybiera szyfr z podmenu:
-0 = Vigenere, 1 = permutacyjny, 2 = podstawieniowy (Cezara), 3 = powrot do menu.
+Wybor algorytmu: suma numerow indeksow modulo 3.
+0 = szyfr podstawieniowy (Cezara), 1 = Vigenere, 2 = permutacyjny.
 """
 
 # Modul re sluzy do sprawdzania poprawnosci danych za pomoca wyrazen regularnych.
@@ -21,36 +21,18 @@ def pobierz_tekst(etykieta):
     return tekst
 
 
-def wybierz_szyfr():
-    """Wyswietla podmenu z lista szyfrow i zwraca numer wybranego szyfru.
+def pobierz_indeksy():
+    """Wczytuje numery indeksow i zwraca reszte z ich sumy modulo 3.
 
-    Zwraca '0', '1' lub '2' (numer szyfru) albo None, gdy wybrano 3 (powrot).
-    Petla powtarza pytanie, dopoki uzytkownik nie poda liczby od 0 do 3.
+    Reszta 0 oznacza szyfr podstawieniowy, 1 - Vigenere, 2 - permutacyjny.
     """
-    while True:
-        print("\nWybierz szyfr:")
-        print("0. Szyfr Vigenere")
-        print("1. Szyfr permutacyjny")
-        print("2. Szyfr podstawieniowy (Cezara)")
-        print("3. Powrot do menu glownego")
-        wybor = input("Twoj wybor: ").strip()
-        # 3 oznacza powrot - zwracamy None, a glowna petla wraca do menu.
-        if wybor == '3':
-            return None
-        # Akceptujemy tylko numery szyfrow widoczne w podmenu.
-        if wybor in ('0', '1', '2'):
-            return wybor
-        # Kazda inna wartosc (litera, 7, -1, pusty napis) -> komunikat i ponowne pytanie.
-        print("Blad: podaj poprawna liczbe (0, 1, 2 lub 3).")
-
-
-def sprawdz_litery(tekst):
-    """Szyfry Cezara i Vigenere zmieniaja tylko litery A-Z/a-z.
-
-    Tekst bez zadnej takiej litery (np. '123!') wyszedlby bez zmian, wiec go odrzucamy.
-    """
-    if not re.search(r"[A-Za-z]", tekst):
-        raise ValueError("Tekst musi zawierac co najmniej jedna litere A-Z.")
+    dane = input("Numery indeksow (oddziel spacjami lub przecinkami): ").strip()
+    if not re.fullmatch(r"\d+(?:[\s,;]+\d+)*", dane):
+        raise ValueError("Podaj co najmniej jeden poprawny numer indeksu (cyfry).")
+    # Dzielimy wpisany ciag po spacjach, przecinkach lub srednikach.
+    # Kazdy fragment zamieniamy na liczbe calkowita.
+    indeksy = [int(x) for x in re.split(r"[\s,;]+", dane)]
+    return sum(indeksy) % 3
 
 
 def pobierz_klucz_liczbowy():
@@ -58,11 +40,7 @@ def pobierz_klucz_liczbowy():
     wartosc = input("Klucz - liczba calkowita: ").strip()
     if not re.fullmatch(r"[+-]?\d+", wartosc):
         raise ValueError("Klucz musi byc liczba calkowita.")
-    klucz = int(wartosc)
-    # Przesuniecie o 0, 26, 52... nie zmienia zadnej litery, wiec taki klucz odrzucamy.
-    if klucz % 26 == 0:
-        raise ValueError("Klucz nie moze byc wielokrotnoscia 26 (tekst by sie nie zmienil).")
-    return klucz
+    return int(wartosc)
 
 
 def pobierz_klucz_slowo():
@@ -164,6 +142,7 @@ def menu():
 
 def uruchom():
     """Glowna petla programu: menu, walidacja, wybor szyfru i wynik."""
+    print("Szyfr wybierany automatycznie z sumy indeksow modulo 3.")
     # Petla dziala do wybrania zera albo przerwania programu.
     while True:
         try:
@@ -172,33 +151,29 @@ def uruchom():
                 print("Koniec programu.")
                 return
             if opcja == '3':
-                print("0: Vigenere, klucz: slowo co najmniej 8-literowe")
-                print("1: permutacyjny, stala permutacja:", PERMUTACJA)
-                print("2: podstawieniowy (Cezara), klucz: liczba calkowita")
+                print("0: podstawieniowy (Cezara), klucz: liczba calkowita")
+                print("1: Vigenere, klucz: slowo co najmniej 8-literowe")
+                print("2: permutacyjny, stala permutacja:", PERMUTACJA)
                 continue
             if opcja not in ('1', '2'):
                 print("Blad: wybierz 0, 1, 2 lub 3.")
                 continue
 
-            # Po wyborze szyfrowania/deszyfrowania uzytkownik sam wybiera szyfr z podmenu.
-            szyfr = wybierz_szyfr()
-            # None oznacza, ze uzytkownik wybral 3 (powrot) - wracamy do menu glownego.
-            if szyfr is None:
-                continue
+            # Rodzaj szyfru wynika z numerow indeksow, a nie z recznego wyboru.
+            typ = pobierz_indeksy()
             deszyfruj = opcja == '2'
+            print("Wybrany szyfr:", ('podstawieniowy', 'Vigenere', 'permutacyjny')[typ])
             tekst = pobierz_tekst("Podaj szyfrogram: " if deszyfruj else "Podaj tekst jawny: ")
             # Dla kazdego algorytmu pobieramy odpowiedni rodzaj klucza.
             # Permutacja nie wymaga podawania klucza, bo jest stala w kodzie.
-            if szyfr == '0':
-                sprawdz_litery(tekst)
-                klucz = pobierz_klucz_slowo()
-                wynik = szyfr_vigenere(tekst, klucz, deszyfruj)
-            elif szyfr == '1':
-                wynik = szyfr_permutacyjny(tekst, deszyfruj)
-            else:
-                sprawdz_litery(tekst)
+            if typ == 0:
                 klucz = pobierz_klucz_liczbowy()
                 wynik = szyfr_podstawieniowy(tekst, klucz, deszyfruj)
+            elif typ == 1:
+                klucz = pobierz_klucz_slowo()
+                wynik = szyfr_vigenere(tekst, klucz, deszyfruj)
+            else:
+                wynik = szyfr_permutacyjny(tekst, deszyfruj)
             print("\nWYNIK:", wynik)
         # Nieprawidlowe dane nie koncza programu: pokazujemy komunikat
         # i wracamy do menu, aby mozna bylo sprobowac ponownie.
