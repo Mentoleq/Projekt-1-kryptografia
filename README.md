@@ -103,7 +103,3 @@ projekt-1-kryptografia/
 ├── projekt_1_kryptografia.py
 └── README.md
 ```
-
-## Oddanie projektu
-
-Umieść oba pliki w repozytorium GitHub i przekaż link do repozytorium zgodnie z zasadami zaliczenia.
