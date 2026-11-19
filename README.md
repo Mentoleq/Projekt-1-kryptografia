@@ -2,21 +2,6 @@
 
 Projekt zaliczeniowy z przedmiotu **Kryptografia – ćwiczenia** (semestr jesienny 2026). Aplikacja konsolowa napisana w Pythonie umożliwia szyfrowanie i deszyfrowanie tekstu.
 
-## Wymagania
-
-- Python 3 (bez instalowania dodatkowych bibliotek).
-- Terminal / wiersz poleceń.
-
-## Uruchomienie
-
-Pobierz plik `projekt_1_kryptografia.py`, otwórz terminal w katalogu z plikiem i wykonaj:
-
-```bash
-python projekt_1_kryptografia.py
-```
-
-Jeśli polecenie `python` nie działa, spróbuj `python3 projekt_1_kryptografia.py` (Linux/macOS) lub `py projekt_1_kryptografia.py` (Windows).
-
 ## Menu
 
 ```text
@@ -94,7 +79,6 @@ Przy błędnych danych program wyświetla komunikat i wraca do menu.
 
 - Szyfry Cezara i Vigenère'a zmieniają wyłącznie litery `A–Z` i `a–z`, zachowując ich wielkość. Polskie znaki, cyfry, spacje i interpunkcja pozostają bez zmian.
 - Szyfr permutacyjny przestawia **wszystkie znaki**, także spacje i znaki interpunkcyjne.
-- Projekt ma charakter edukacyjny; zastosowane szyfry nie służą do ochrony współczesnych poufnych danych.
 
 ## Struktura projektu
 
